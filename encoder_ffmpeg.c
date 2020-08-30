@@ -53,6 +53,8 @@ extern "C" {
 	{
 		
 		//FFMPEG CODEC INIT
+		
+		char options[256];
 
 		avcodec_register_all();
 	
@@ -107,7 +109,11 @@ extern "C" {
 		av_opt_set(c->priv_data, "slices", "4", 0);
 		//c->level = 32;
 			//av_opt_set(c->priv_data, "movflags", "faststart", 0);
-		av_opt_set(c->priv_data, "x264opts", "no-mbtree:sliced-threads:sync-lookahead=0", 0);
+		sprintf(options,"no-mbtree:sliced-threads:sync-lookahead=0:intra-refresh:vbv-maxrate=%d:vbv-bufsize=%d",
+			*bit_rate / 1000,
+			(*bit_rate / *fps) / 1000);
+			
+		av_opt_set(c->priv_data, "x264opts", options, 0);
 		/* open it */
 		if (avcodec_open2(c, codec, NULL) < 0) {
 			fprintf(stderr, "Could not open codec\n");
